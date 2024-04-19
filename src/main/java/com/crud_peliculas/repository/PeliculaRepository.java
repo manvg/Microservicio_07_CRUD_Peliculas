@@ -1,5 +1,9 @@
 package com.crud_peliculas.repository;
 
-public class PeliculaRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.crud_peliculas.model.entities.Pelicula;
+
+public interface PeliculaRepository extends JpaRepository<Pelicula, Integer>{
 
 }

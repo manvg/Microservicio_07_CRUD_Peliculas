@@ -9,6 +9,7 @@ import com.crud_peliculas.model.dto.PeliculaDto;
 import com.crud_peliculas.model.entities.Pelicula;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,4 +25,15 @@ public class PeliculaServiceImpl implements PeliculaService{
         List<Pelicula> lstPeliculas = peliculaRepository.findAll();
         return lstPeliculas.stream().map(peliculaMapper::convertirADTO).collect(Collectors.toList());
     }
+
+    @Override
+    public PeliculaDto getPeliculaById(Integer id){
+        var pelicula = peliculaRepository.findById(id);
+        if (!pelicula.isEmpty()) {
+            return peliculaMapper.convertirADTO(pelicula.get());
+        }else{
+            return null;
+        }
+    }
+    
 }

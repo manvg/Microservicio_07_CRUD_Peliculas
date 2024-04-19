@@ -1,4 +1,4 @@
-package com.crud_peliculas.peliculas;
+package com.crud_peliculas;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

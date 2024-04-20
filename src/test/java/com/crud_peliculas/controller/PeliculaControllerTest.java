@@ -5,13 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.crud_peliculas.model.entities.Pelicula;
@@ -28,41 +26,38 @@ public class PeliculaControllerTest {
     @Test
     public void obtenerTodosTest() throws Exception{
         Pelicula pelicula1 = new Pelicula();
-        pelicula1.setAnio(2024);
-        pelicula1.setDirector("Director test");
-        pelicula1.setGenero("Acción test");
-        pelicula1.setSinopsis("Sinopsis test");
-        pelicula1.setTitulo("Titulo test");
+        pelicula1.setAnio(2023);
+        pelicula1.setDirector("Christopher Nolan");
+        pelicula1.setGenero("Drama");
+        pelicula1.setSinopsis("En tiempos de guerra, el brillante físico estadounidense Julius Robert Oppenheimer, al frente del Proyecto Manhattan...");
+        pelicula1.setTitulo("Oppenheimer");
         pelicula1.setId(Long.parseLong("1"));
 
         Pelicula pelicula2 = new Pelicula();
-        pelicula2.setAnio(2023);
-        pelicula2.setDirector("Director 2 test");
-        pelicula2.setGenero("Acción 2 test");
-        pelicula2.setSinopsis("Sinopsis 2 test");
-        pelicula2.setTitulo("Titulo 2 test");
+        pelicula2.setAnio(2014);
+        pelicula2.setDirector("Christopher Nolan");
+        pelicula2.setGenero("Ciencia Ficción");
+        pelicula2.setSinopsis("Al ver que la vida en la Tierra está llegando a su fin, un grupo de exploradores dirigidos por el piloto Cooper...");
+        pelicula2.setTitulo("Interstellar");
         pelicula2.setId(Long.parseLong("2"));
 
-        List<Pelicula> lstPeliculas = List.of(pelicula1, pelicula2);
-        when(peliculaServiceMock.getAllPeliculas()).thenReturn(lstPeliculas);
+        List<Pelicula> peliculas = List.of(pelicula1, pelicula2);
+        when(peliculaServiceMock.getAllPeliculas()).thenReturn(peliculas);
 
-        // List<EntityModel<Pelicula>> studentsResources = lstPeliculas.stream()
-        //     .map(pelicula -> EntityModel.of(pelicula))
-        //     .collect(Collectors.toList());
-
-        mockMvc.perform(get("/peliculas")).andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.students.length()").value(2))
-                .andExpect(jsonPath("$._embedded.students[0].anio").value(2024))
-                .andExpect(jsonPath("$._embedded.students[0].director").value("Director test"))
-                .andExpect(jsonPath("$._embedded.students[0].genero").value("Genero test"))
-                .andExpect(jsonPath("$._embedded.students[0].sinopsis").value("Sinopsis test"))
-                .andExpect(jsonPath("$._embedded.students[0].titulo").value("Titulo test"))
-                .andExpect(jsonPath("$._embedded.students[0]._links.self.href").value("http://localhost:8087/peliculas/1"))
-                .andExpect(jsonPath("$._embedded.students[1].anio").value(2023))
-                .andExpect(jsonPath("$._embedded.students[1].director").value("Director 2 test"))
-                .andExpect(jsonPath("$._embedded.students[1].genero").value("Genero 2 test"))
-                .andExpect(jsonPath("$._embedded.students[1].sinopsis").value("Sinopsis 2 test"))
-                .andExpect(jsonPath("$._embedded.students[1].titulo").value("Titulo 2 test"))
-                .andExpect(jsonPath("$._embedded.students[1]._links.self.href").value("http://localhost:8087/peliculas/2"));
+        mockMvc.perform(get("/peliculas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.peliculaList.length()").value(2))
+                .andExpect(jsonPath("$._embedded.peliculaList[0].anio").value(2023))
+                .andExpect(jsonPath("$._embedded.peliculaList[0].director").value("Christopher Nolan"))
+                .andExpect(jsonPath("$._embedded.peliculaList[0].genero").value("Drama"))
+                .andExpect(jsonPath("$._embedded.peliculaList[0].sinopsis").value("En tiempos de guerra, el brillante físico estadounidense Julius Robert Oppenheimer, al frente del Proyecto Manhattan..."))
+                .andExpect(jsonPath("$._embedded.peliculaList[0].titulo").value("Oppenheimer"))
+                .andExpect(jsonPath("$._embedded.peliculaList[0]._links.self.href").value("http://localhost/peliculas/1"))
+                .andExpect(jsonPath("$._embedded.peliculaList[1].anio").value(2014))
+                .andExpect(jsonPath("$._embedded.peliculaList[1].director").value("Christopher Nolan"))
+                .andExpect(jsonPath("$._embedded.peliculaList[1].genero").value("Ciencia Ficción"))
+                .andExpect(jsonPath("$._embedded.peliculaList[1].sinopsis").value("Al ver que la vida en la Tierra está llegando a su fin, un grupo de exploradores dirigidos por el piloto Cooper..."))
+                .andExpect(jsonPath("$._embedded.peliculaList[1].titulo").value("Interstellar"))
+                .andExpect(jsonPath("$._embedded.peliculaList[1]._links.self.href").value("http://localhost/peliculas/2"));
     }
 }

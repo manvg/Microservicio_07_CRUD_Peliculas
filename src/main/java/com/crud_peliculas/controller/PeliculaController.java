@@ -45,7 +45,8 @@ public class PeliculaController {
     //     log.info("Retornando todos los estudiantes");
     //     return peliculaService.getAllPeliculas();
     // }
-    
+
+    //Obtener todas las peliculas retornando recursos HATEOAS
     @GetMapping
     public CollectionModel<EntityModel<Pelicula>> getAllPeliculas() {
         List<Pelicula> peliculas = peliculaService.getAllPeliculas();

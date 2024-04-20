@@ -1,4 +1,4 @@
-package com.crud_peliculas.peliculas;
+package com.crud_peliculas;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

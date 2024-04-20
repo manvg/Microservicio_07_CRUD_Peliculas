@@ -1,10 +1,10 @@
 package com.crud_peliculas.controller;
-import com.crud_peliculas.model.dto.PeliculaDto;
-import com.crud_peliculas.model.dto.ResponseModel;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,86 +14,89 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crud_peliculas.advice.PeliculaNotFoundException;
+import com.crud_peliculas.model.entities.Pelicula;
 import com.crud_peliculas.service.PeliculaService;
 
-import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/peliculas")
 public class PeliculaController {
+
+
     private static final Logger log = LoggerFactory.getLogger(PeliculaController.class);
 
     @Autowired
     private PeliculaService peliculaService;
 
-    //---------MÉTODOS GET---------//
-
-    //Obtener lista completa de peliculas
     @GetMapping
-    public List<PeliculaDto> getAllPeliculas(){
-        log.info("GET /peliculas -> getAllPeliculas");
-        return peliculaService.getAllPeliculas();
-    }
+    public CollectionModel<EntityModel<Pelicula>> getAllPeliculas() {
+        List<Pelicula> peliculas = peliculaService.getAllPeliculas();
+        log.info("GET /pelicula");
+        log.info("Retornando todas las peliculas");
+        List<EntityModel<Pelicula>> peliculaResources = peliculas.stream()
+            .map( pelicula -> EntityModel.of(pelicula,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getPeliculaById(pelicula.getIdPelicula())).withSelfRel()
+            ))
+            .collect(Collectors.toList());
 
-    //Obtener pelicula por su id
+        WebMvcLinkBuilder linkTo = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllPeliculas());
+        CollectionModel<EntityModel<Pelicula>> resources = CollectionModel.of(peliculaResources, linkTo.withRel("pelicula"));
+
+        return resources;
+    }
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getPeliculaById(@PathVariable Integer id){
-        log.info("GET /peliculas/" + id + " -> getPeliculaById");
-        log.info("Obteniendo pelicula por id " + id);
-        var response = peliculaService.getPeliculaById(id);
-        if (response == null) {
-            log.error("No se encontro pelicula con id " + id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseModel(false,"La película ingresada no existe."));
-        }
-        log.info("Pelicula encontrada con éxito. Id: " + id);
-        return ResponseEntity.ok(response);
-    }
+    public EntityModel<Pelicula> getPeliculaById(@PathVariable Long id) {
+        var pelicula = peliculaService.getPeliculaById(id);
 
-    //---------MÉTODOS POST---------//
-    //Crear película
+        if (pelicula != null) {
+            return EntityModel.of(pelicula,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getPeliculaById(id)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllPeliculas()).withRel("all-peliculas"));
+        } else {
+            throw new PeliculaNotFoundException("Pelicula no encontrada, id: " + id);
+        }
+    }
     @PostMapping
-    public ResponseEntity<Object> createPelicula(@RequestBody @Valid PeliculaDto pelicula){
-        log.info("POST /peliculas/createPelicula");
-        log.info("Creando pelicula...");
+    public EntityModel<Pelicula> createPelicula(@Validated @RequestBody Pelicula pelicula) {
+        Pelicula createdPelicula = peliculaService.createPelicula(pelicula);
+            return EntityModel.of(createdPelicula,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getPeliculaById(createdPelicula.getIdPelicula())).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllPeliculas()).withRel("all-peliculas"));
 
-        var response = peliculaService.createPelicula(pelicula);
-
-        log.info(response.getMessage());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    //---------MÉTODOS PUT---------//
-    //Actualizar pelicula
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updatePelicula(@PathVariable Integer id, @RequestBody @Valid PeliculaDto peliculaDto){
-        log.info("PUT /peliculas/"+id);
-        log.info("Actualizando pelicula con id " + id);
-        var response = peliculaService.updatePelicula(id, peliculaDto);
-        if (response == null) {
-            log.error("No existe una pelicula con id " + id);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseModel(false,"La pelicula ingresada no existe."));
-        }
-        log.info("Pelicula actualizada con éxito. Id " + id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public EntityModel<Pelicula> updatePelicula(@PathVariable Long id, @RequestBody Pelicula pelicula) {
+        Pelicula updatedPelicula = peliculaService.updatePelicula(id, pelicula);
+        return EntityModel.of(updatedPelicula,
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getPeliculaById(id)).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllPeliculas()).withRel("all-pelicula"));
+
+    }
+    @DeleteMapping("/{id}")
+    public void deletePelicula(@PathVariable Long id){
+        peliculaService.deletePelicula(id);
     }
 
-    //---------MÉTODOS DELETE---------//
-    //Eliminar pelicula
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletePelicula(@PathVariable Integer id){
-        log.info("DELETE /peliculas/"+id);
-        log.info("Eliminando pelicula con id " + id);
-  
-        var response = peliculaService.deletePelicula(id);
-        if (!response.getStatus()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+    static class ErrorResponse {
+        private final String message;
+    
+        public ErrorResponse(String message) {
+            this.message = message;
         }
-        log.info("Pelicula eliminado con éxito");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    
+        public String getMessage() {
+            return message;
+        }
     }
+
+
 }

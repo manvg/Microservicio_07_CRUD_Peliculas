@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.crud_peliculas.model.dto.PeliculaDto;
 import com.crud_peliculas.model.dto.ResponseModel;
+import com.crud_peliculas.model.entities.Pelicula;
 
 public interface PeliculaService {
-    List<PeliculaDto> getAllPeliculas();
-    PeliculaDto getPeliculaById(Integer id);
-    ResponseModel createPelicula(PeliculaDto usuario);
-    ResponseModel updatePelicula(Integer id, PeliculaDto usuario);
-    ResponseModel deletePelicula(Integer id);
+    List<Pelicula> getAllPeliculas();
+    Pelicula getPeliculaById(Long id);
+    Pelicula createPelicula(Pelicula usuario);
+    Pelicula updatePelicula(Long id, Pelicula usuario);
+    ResponseModel deletePelicula(Long id);
 }

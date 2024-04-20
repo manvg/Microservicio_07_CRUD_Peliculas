@@ -22,16 +22,15 @@ public class PeliculaServiceImpl implements PeliculaService{
     private PeliculaMapper peliculaMapper;
 
     @Override
-    public List<PeliculaDto> getAllPeliculas(){
-        List<Pelicula> lstPeliculas = peliculaRepository.findAll();
-        return lstPeliculas.stream().map(peliculaMapper::convertirADTO).collect(Collectors.toList());
+    public List<Pelicula> getAllPeliculas(){
+        return peliculaRepository.findAll();
     }
 
     @Override
-    public PeliculaDto getPeliculaById(Integer id){
+    public Pelicula getPeliculaById(Long id){
         var pelicula = peliculaRepository.findById(id);
         if (!pelicula.isEmpty()) {
-            return peliculaMapper.convertirADTO(pelicula.get());
+            return pelicula.get();
         }else{
             return null;
         }
@@ -39,34 +38,35 @@ public class PeliculaServiceImpl implements PeliculaService{
 
     //---------POST---------//
     @Override
-    public ResponseModel createPelicula(PeliculaDto peliculaDto){
-        Pelicula pelicula = peliculaMapper.convertirAEntity(peliculaDto);//Mapeo
-        var resultado = peliculaRepository.save(pelicula);
-        return new ResponseModel(true, "Pelicula creado con éxito. Id: " + resultado.getIdPelicula());
+    public Pelicula createPelicula(Pelicula objPelicula){
+        //Pelicula pelicula = peliculaMapper.convertirAEntity(peliculaDto);//Mapeo
+        return peliculaRepository.save(objPelicula);
+        //return new ResponseModel(true, "Pelicula creado con éxito. Id: " + resultado.getIdPelicula());
     }
     
     //---------PUT---------//
     @Override
-    public ResponseModel updatePelicula(Integer id, PeliculaDto peliculaDto){
+    public Pelicula updatePelicula(Long id, Pelicula objPelicula){
         var peliculaExiste = peliculaRepository.findById(id);
         if (!peliculaExiste.isEmpty()) {
             Pelicula pelicula = peliculaExiste.get();
-            pelicula.setAnio(peliculaDto.getAnio());
-            pelicula.setDirector(peliculaDto.getDirector());
-            pelicula.setGenero(peliculaDto.getGenero());
-            pelicula.setSinopsis(pelicula.getSinopsis());
-            pelicula.setTitulo(peliculaDto.getTitulo());
+            pelicula.setAnio(objPelicula.getAnio());
+            pelicula.setDirector(objPelicula.getDirector());
+            pelicula.setGenero(objPelicula.getGenero());
+            pelicula.setSinopsis(objPelicula.getSinopsis());
+            pelicula.setTitulo(objPelicula.getTitulo());
 
-            var resultado = peliculaRepository.save(pelicula);
-            return new ResponseModel(true, "Película actualizada con éxito. Id: " + resultado.getIdPelicula());
+            return peliculaRepository.save(pelicula);
+            //return new ResponseModel(true, "Película actualizada con éxito. Id: " + resultado.getIdPelicula());
         }else{
-            return new ResponseModel(false, "La película ingresada no existe");
+            return null;
+            //return new ResponseModel(false, "La película ingresada no existe");
         }
     }
 
     //---------DELETE---------//
     @Override
-    public ResponseModel deletePelicula(Integer id){
+    public ResponseModel deletePelicula(Long id){
         if (peliculaRepository.existsById(id)) {
             peliculaRepository.deleteById(id);
             return new ResponseModel(true, "Película eliminada con éxito");

@@ -2,7 +2,6 @@ package com.crud_peliculas.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,18 +19,18 @@ public class PeliculaRepositoryTest {
     public void guardarPeliculaTest(){
         Pelicula pelicula = new Pelicula();
         pelicula.setAnio(2024);
-        pelicula.setDirector("Director test");
-        pelicula.setGenero("Acción test");
-        pelicula.setSinopsis("Sinopsis test");
-        pelicula.setTitulo("Titulo test");
+        pelicula.setDirector("Director TEST");
+        pelicula.setGenero("Acción TEST");
+        pelicula.setSinopsis("Sinopsis TEST");
+        pelicula.setTitulo("Titulo TEST");
 
         Pelicula resultado = peliculaRepository.save(pelicula);
 
         assertNotNull(resultado.getIdPelicula());
         assertEquals(2024, resultado.getAnio());
-        assertEquals("Director test", resultado.getDirector());
-        assertEquals("Acción test", resultado.getGenero());
-        assertEquals("Sinopsis test", resultado.getSinopsis());
-        assertEquals("Titulo test", resultado.getTitulo());
+        assertEquals("Director TEST", resultado.getDirector());
+        assertEquals("Acción TEST", resultado.getGenero());
+        assertEquals("Sinopsis TEST", resultado.getSinopsis());
+        assertEquals("Titulo TEST", resultado.getTitulo());
     }
 }

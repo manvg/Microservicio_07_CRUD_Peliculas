@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8080:8088"
     environment:
       - spring.datasource.url=jdbc:oracle:thin:@d37jy763wifjocgz_tp?TNS_ADMIN=/app/oracle_wallet/
       - spring.datasource.username=S4_FULLSTACK
